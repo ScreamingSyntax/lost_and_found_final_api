@@ -5,7 +5,7 @@ module.exports = {
     viewProduct: callBack => {
         pool.query("SELECT * FROM items WHERE item_id NOT IN (SELECT item_id FROM claim WHERE claim_status = 'Approved' or claim_status='Pending')",
         (err,result,field)=>{
-            // console.log("dadadadad")
+           
             if(err){
                 return callBack(err,null);
             }
@@ -45,7 +45,7 @@ module.exports = {
         pool.query("SELECT * FROM `items` JOIN claim ON items.item_id = claim.item_id WHERE claim.claim_status=? order by items.item_id",
         [data.status],
         (err,result,field)=>{
-            // console.log("dadadadad")
+           
             if(err){
                 return callBack(err,null);
             }
@@ -58,8 +58,8 @@ module.exports = {
     addItem: (data,filePath, callBack) => {
         const imageName = filePath;
         const initialPath = "upload/images";
-        console.log(`This is final path `+imageName); 
-        console.log(data)
+      
+
         pool.query("INSERT INTO items(item_name,item_image,found_location,found_by,found_date) VALUES (?,?,?,?,?)",
             [data.item_name,
             imageName,
@@ -68,7 +68,7 @@ module.exports = {
             data.found_date
             ],
             (err, result, fields) => {
-                console.log(err)
+    
                 if (err) {
                     return callBack(err, null);
                 } else {
@@ -91,7 +91,7 @@ module.exports = {
         )
     } ,
     updateItemName:(data,imagePath,callBack)=>{
-        // console.log(data)
+    
         pool.query("UPDATE items SET item_name = ?, item_image = ?, found_location = ?, found_by = ?, found_date = ? where item_id = ?",
         [data.item_name,
         imagePath,
@@ -122,7 +122,7 @@ module.exports = {
         `,
         [data.claim_id,data.item_id,data.claim_id,data.item_id],
         (err,result,fields)=>{
-            console.log(err)
+       
             if(err){
                 return callBack(err,null)
             }
@@ -136,7 +136,7 @@ module.exports = {
         `,
         [data.claim_id,data.item_id],
         (err,result,fields)=>{
-            console.log(err)
+          
             if(err){
                 return callBack(err,null)
             }

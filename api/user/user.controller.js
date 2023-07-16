@@ -23,7 +23,7 @@ module.exports = {
         const data = req.body;
         fetchDateTime().then((value)=>
         {
-        console.log('This is the value',value)
+
         if (value == false){
             return res.json({
                 success:0,
@@ -48,7 +48,7 @@ module.exports = {
     },
     searchProductController:(req,res)=>{
         const data = req.body;
-        console.log(data)
+     
         searchProductService(data,(err,results)=>{
             if (err){
                 return res.json({

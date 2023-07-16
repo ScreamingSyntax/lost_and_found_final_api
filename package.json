@@ -3,6 +3,9 @@
   "version": "1.0.0",
   "description": "This is the api for lost and found application used by Itahari International College",
   "main": "app.js",
+  "engines": {
+    "node": ">=18.0.0 < 20.4.0"
+  },
   "scripts": {
     "start": "node app.js",
     "test": "echo \"Error: no test specified\" && exit 1"
