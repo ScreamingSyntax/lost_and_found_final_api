@@ -1,4 +1,5 @@
 const { createPool } = require("mysql2");
+require('dotenv').config()
 
 // const pool = createPool({
 //   host: "sql.freedb.tech",
@@ -8,10 +9,10 @@ const { createPool } = require("mysql2");
 // });
 
 const pool = createPool({
-  host: "localhost",
-  user: "root",
-  password: "",
-  database: "lost_and_found"
+  host: process.env.HOST,
+  user: process.env.DATABASE_USER,
+  password: process.env.DATABASE_PASSWORD,
+  database: process.env.DATABASE_NAME
 });
 
 // Attempt to get a connection from the pool

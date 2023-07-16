@@ -6,6 +6,7 @@ const { response } = require('express');
 const moment = require("moment-timezone");
 const { fetchDateTime } = require('../tools/date.time');
 moment.tz.setDefault("Asia/Kathmandu");
+require('dotenv').config()
 
 // let checkOtp;
 
@@ -16,10 +17,6 @@ otpFun = () => {
   otp = parseInt(otp);
   return otp;
 } 
-userOtp=(otp)=>{
-  let verifyOpt = otp
-  return verifyOpt;
-}
 
 let transporter = nodemailer.createTransport({
     host: "smtp.gmail.com",
@@ -27,8 +24,8 @@ let transporter = nodemailer.createTransport({
     secure: true,
     service : 'Gmail',
     auth: {
-      user: 'biratnagarinternationaltest@gmail.com',
-      pass: 'aseqmhdygxuwzueb',
+      user: process.env.MAILER_EMAIL,
+      pass: process.env.MAILER_PASSWORD,
     }
     
 });
@@ -62,7 +59,7 @@ router.post('/send',function(req,res){
        <!DOCTYPE html>
 <html>
 <head>
-  <title>Lost and Found Application - Team Elevate</title>
+  <title>Lost and Found Application  - Team Elevate</title>
   <style>
     body {
       font-family: Arial, sans-serif;
@@ -228,21 +225,6 @@ router.post('/verify', function (req, res) {
   );
       
 })
-});
-
-router.post('/resend',function(req,res){
-    var mailOptions={
-        to: email,
-       subject: "Otp for registration is: ",
-       html: "<h3>OTP for account verification is </h3>"  + "<h1 style='font-weight:bold;'>" + otp +"</h1>" // html body
-     };
-     
-     transporter.sendMail(mailOptions, (error, info) => {
-        if (error) {
-            return console.log(error);
-        }
-    });
-
 });
 
 module.exports = router

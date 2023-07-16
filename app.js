@@ -3,8 +3,8 @@ const app = express();
 const cors = require("cors");
 const pool = require("./config/database")
 const fs = require('fs')
-
-
+const dotenv = require('dotenv')
+dotenv.config();
 app.use(cors({
     origin:'*'
 }))
