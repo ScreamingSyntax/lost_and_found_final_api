@@ -8,7 +8,6 @@ async function fetchDateTime()
     try {
        const response = await axios.get('http://worldtimeapi.org/api/timezone/Asia/Kathmandu');
        const { datetime } = response.data;
-       console.log(`this is date`,datetime)
        return datetime
       }
        catch (error) {

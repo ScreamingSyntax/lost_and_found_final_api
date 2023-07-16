@@ -12,9 +12,8 @@ const deleteImage = (filePath,imageName) => {
 
 module.exports = {
     viewProduct: (req, res) => {
-        // console.log("dadada")
         viewProductService((err, results) => {
-            // console.log(results);
+
             if (err) {
                 return res.json({
                     success: 0,
@@ -58,10 +57,10 @@ module.exports = {
         })
     },
     sortProduct: (req, res) => {
-        // console.log("dadada")
+
         const data = req.body;
         sortByStatus(data,(err, results) => {
-            // console.log(results);
+
             if (err) {
                 return res.json({
                     success: 0,
@@ -82,11 +81,11 @@ module.exports = {
             })
         }
         const filePath =req.file.filename;
-        // console.log(`The file name is here ${filePath}`);
+
         const data = req.body;
-        // console.log(data);
+      
         addItemService(data,filePath, (err, results) => {
-            // console.log(results);
+            
             if (err) {
                 return res.json({
                     success: 0,
@@ -102,8 +101,8 @@ module.exports = {
     removeItem:(req,res)=>{
         const directoryPath = "upload/images"
         const data = req.body;
-        // console.log(data)
-        console.log("Hello")
+
+  
         removeItemService(data,(err,results)=>{
             if(err){
                 return res.json({
@@ -121,7 +120,7 @@ module.exports = {
     updateItemName:(req,res)=>{
         const filePath =req.file.filename;
         const data = req.body;
-        // console.log("This is data ",data.item_name)
+
         updateItemNameService(data,filePath,(err,results)=>{
             if(err){
                 return res.json({
@@ -137,9 +136,9 @@ module.exports = {
     },
     approveItemController:(req,res)=>{
         const data = req.body;
-        console.log(data)
+
         approveItemsService(data,(err,results)=>{
-            console.log(results)
+          
             if (err){
                 return res.json({
                     success:0,
@@ -154,7 +153,7 @@ module.exports = {
     },
     rejectItemController:(req,res)=>{
         const data = req.body;
-        console.log(data)
+     
         rejectItemsService(data,(err,results)=>{
             if (err){
                 return res.json({

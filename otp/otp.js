@@ -34,17 +34,17 @@ router.post('/send',function(req,res){
     email=req.body.email;
     userName=req.body.name;
     var otp = otpFun();
-    console.log(otp)
+    
     pool.query(
         "SELECT * FROM otp_data where email=? and name=?",
         [email,userName],
         (err,result,field)=>{
-            console.log(result)
+            
             if(result.length==0){
                 pool.query("INSERT into otp_data(email,otp,name) values (?,?,?)",
                 [email,otp,userName])
             }
-            console.log(otp)
+            
             if(result.length!=0){
                 pool.query("UPDATE otp_data set otp=? where email=? and name=?",
                 [otp,email,userName]
@@ -165,16 +165,16 @@ router.post('/send',function(req,res){
 });
 
 router.post('/verify', function (req, res) {
-  console.log(`this is body`, req.body)
+
 
   const email = req.body.email;
   const otp = req.body.otp;
   const item_id = req.body.item_id;
-  console.log(`Suyog le pathako Otp${otp}`);
+
   const userName = req.body.userName;
 
   fetchDateTime().then((value)=>{
-  console.log('This is the value',value)
+ 
   if (value == false){
       return res.json({
           success:0,
@@ -188,21 +188,18 @@ router.post('/verify', function (req, res) {
     [email, userName],
     (err, result, field) => {
       if (err) {
-        console.log(err);
+  
         return res.json({
           success: 0,
           message: "Server Error"
         });
       }
-      console.log('This is the result', result[0].otp);
-      console.log(otp)
+ 
       if (result.length > 0 && result[0].otp == otp) {
         pool.query(
           "INSERT INTO claim (item_id, claimed_by, claimed_by_email, claim_status,claimed_date) VALUES (?, ?, ?, ?,?)",
           [item_id, userName, email, "Pending",current_date],
           (err, result, fields) => {
-            console.log(result);
-            console.log(err);
             if (err) {
               return res.json({
                 success: 0,
