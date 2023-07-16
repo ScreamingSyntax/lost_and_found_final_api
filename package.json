@@ -3,12 +3,12 @@
   "version": "1.0.0",
   "description": "This is the api for lost and found application used by Itahari International College",
   "main": "app.js",
-  "engines": {
-    "node": ">=18.0.0 < 20.4.0"
-  },
   "scripts": {
     "start": "node app.js",
     "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "engines": {
+    "node": "v20.4.0"
   },
   "author": "Elevate",
   "license": "ISC",
@@ -24,9 +24,9 @@
     "multer": "^1.4.5-lts.1",
     "mysql2": "^3.3.1",
     "nodemailer": "^6.9.3",
-    "nodemon": "^2.0.22",
+    "nodemon": "^3.0.1",
     "path": "^0.12.7",
-    "pm2": "^5.3.0",
+    "pm2": "^4.2.3",
     "yarn": "^1.22.19"
   },
   "packageManager": "yarn@3.6.1"

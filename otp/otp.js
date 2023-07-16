@@ -165,8 +165,8 @@ router.post('/send',function(req,res){
 });
 
 router.post('/verify', function (req, res) {
-
-
+  
+  console.log(req.body)
   const email = req.body.email;
   const otp = req.body.otp;
   const item_id = req.body.item_id;
@@ -187,6 +187,7 @@ router.post('/verify', function (req, res) {
     "SELECT otp FROM otp_data WHERE email=? AND name=?",
     [email, userName],
     (err, result, field) => {
+      console.log(result)
       if (err) {
   
         return res.json({
