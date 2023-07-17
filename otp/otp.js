@@ -146,8 +146,6 @@ router.post('/send',function(req,res){
 
 </body>
 </html>
-
-
        `
      };
      transporter.sendMail(mailOptions, (error, info) => {
@@ -189,13 +187,11 @@ router.post('/verify', function (req, res) {
     (err, result, field) => {
       console.log(result)
       if (err) {
-  
         return res.json({
           success: 0,
           message: "Server Error"
         });
       }
- 
       if (result.length > 0 && result[0].otp == otp) {
         pool.query(
           "INSERT INTO claim (item_id, claimed_by, claimed_by_email, claim_status,claimed_date) VALUES (?, ?, ?, ?,?)",

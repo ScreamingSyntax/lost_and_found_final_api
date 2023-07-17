@@ -1,5 +1,6 @@
 const pool = require("../../config/database")
 
+
 module.exports = {
 
     viewProduct: callBack => {
@@ -58,8 +59,7 @@ module.exports = {
     addItem: (data,filePath, callBack) => {
         const imageName = filePath;
         const initialPath = "upload/images";
-      
-
+        console.log(data)
         pool.query("INSERT INTO items(item_name,item_image,found_location,found_by,found_date) VALUES (?,?,?,?,?)",
             [data.item_name,
             imageName,
@@ -91,7 +91,6 @@ module.exports = {
         )
     } ,
     updateItemName:(data,imagePath,callBack)=>{
-    
         pool.query("UPDATE items SET item_name = ?, item_image = ?, found_location = ?, found_by = ?, found_date = ? where item_id = ?",
         [data.item_name,
         imagePath,

@@ -1,13 +1,14 @@
-const { viewProduct: viewProductService, addItem: addItemService,removeItem: removeItemService,updateItemName: updateItemNameService,approveItemsService,sortByStatus,rejectItemsService,searchProductService,searchUnclaimedProductService } = require("./admin.service");
+const { viewProduct: viewProductService, addItem: addItemService, removeItem: removeItemService, updateItemName: updateItemNameService, approveItemsService, sortByStatus, rejectItemsService, searchProductService, searchUnclaimedProductService } = require("./admin.service");
 const { json } = require("body-parser");
-const{ fs } = require("node:fs");
+const { fs } = require("node:fs");
 const { unlink } = require('node:fs');
+const cloudinary = require("../../config/cloudinary")
 
-const deleteImage = (filePath,imageName) => {
-    unlink('upload/images/'+imageName, (err) => {
+const deleteImage = (filePath, imageName) => {
+    unlink('upload/images/' + imageName, (err) => {
         if (err) throw err;
         console.log('successfully deleted /tmp/hello');
-      });
+    });
 }
 
 module.exports = {
@@ -26,40 +27,40 @@ module.exports = {
             });
         });
     },
-    searchProductController:(req,res)=>{
+    searchProductController: (req, res) => {
         const data = req.body;
-        searchProductService(data,(err,results)=>{
-            if (err){
+        searchProductService(data, (err, results) => {
+            if (err) {
                 return res.json({
-                    success:0,
-                    message:"Server Issue"
+                    success: 0,
+                    message: "Server Issue"
                 })
             }
             return res.json({
-                success:1,
-                data:results
+                success: 1,
+                data: results
             })
         })
     },
-    searchProductControllerUnclaimed:(req,res)=>{
+    searchProductControllerUnclaimed: (req, res) => {
         const data = req.body;
-        searchUnclaimedProductService(data,(err,results)=>{
-            if (err){
+        searchUnclaimedProductService(data, (err, results) => {
+            if (err) {
                 return res.json({
-                    success:0,
-                    message:"Server Issue"
+                    success: 0,
+                    message: "Server Issue"
                 })
             }
             return res.json({
-                success:1,
-                data:results
+                success: 1,
+                data: results
             })
         })
     },
     sortProduct: (req, res) => {
 
         const data = req.body;
-        sortByStatus(data,(err, results) => {
+        sortByStatus(data, (err, results) => {
 
             if (err) {
                 return res.json({
@@ -73,97 +74,104 @@ module.exports = {
             });
         });
     },
-    addItems: (req, res) => {
-        if(!req.file){
+    addItems: async (req, res) => {
+
+        if (!req.file) {
             return res.json({
                 success: 0,
-                message:"No Image Provided"
+                message: "No Image Provided"
             })
         }
-        const filePath =req.file.filename;
-
+        const directoryPath = "upload/images"
+        const imageUrl = req.file.path;
+        let filePath; 
         const data = req.body;
-      
-        addItemService(data,filePath, (err, results) => {
-            
+        const imageName =req.file.filename;
+        await cloudinary.v2.uploader.upload(imageUrl,
+         { public_id: "olympic_flag" }, 
+        function(error, result)
+         {
+            filePath = result.secure_url; 
+        });
+        addItemService(data, filePath, (err, results) => {
             if (err) {
                 return res.json({
                     success: 0,
                     message: "Error Adding Items"
                 });
             }
+            deleteImage(directoryPath, imageName);
             return res.json({
                 success: 1,
                 data: results
             });
         });
     },
-    removeItem:(req,res)=>{
+    removeItem: (req, res) => {
         const directoryPath = "upload/images"
         const data = req.body;
 
-  
-        removeItemService(data,(err,results)=>{
-            if(err){
+
+        removeItemService(data, (err, results) => {
+            if (err) {
                 return res.json({
-                    success:0,
-                    message:"Error Deleting Items"
+                    success: 0,
+                    message: "Error Deleting Items"
                 })
             }
-            deleteImage(directoryPath,data.item_image);
             return res.json({
-                success:1,
+                success: 1,
                 data: results
             })
         })
     },
-    updateItemName:(req,res)=>{
-        const filePath =req.file.filename;
+    updateItemName: (req, res) => {
+        const filePath = req.file.filename;
         const data = req.body;
 
-        updateItemNameService(data,filePath,(err,results)=>{
-            if(err){
+        updateItemNameService(data, filePath, (err, results) => {
+            if (err) {
                 return res.json({
-                    success:0,
-                    message:"Error Updating Values"
+                    success: 0,
+                    message: "Error Updating Values"
                 })
             }
             return res.json({
-                success:1,
-                data:results
+                success: 1,
+                data: results
             })
         })
     },
-    approveItemController:(req,res)=>{
+    approveItemController: (req, res) => {
         const data = req.body;
 
-        approveItemsService(data,(err,results)=>{
-          
-            if (err){
+        approveItemsService(data, (err, results) => {
+
+            if (err) {
                 return res.json({
-                    success:0,
-                    message:"Error Claiming Item"
+                    success: 0,
+                    message: "Error Claiming Item"
                 })
             }
             return res.json({
-                success:1,
-                message:"Successfully Approved"
+                success: 1,
+                message: "Successfully Approved"
             })
         })
     },
-    rejectItemController:(req,res)=>{
+    rejectItemController: (req, res) => {
         const data = req.body;
-     
-        rejectItemsService(data,(err,results)=>{
-            if (err){
+
+        rejectItemsService(data, (err, results) => {
+            if (err) {
                 return res.json({
-                    success:0,
-                    message:"Error Claiming Item"
+                    success: 0,
+                    message: "Error Claiming Item"
                 })
             }
             return res.json({
-                success:1,
-                message:"Successfully Approved"
+                success: 1,
+                message: "Successfully Approved"
             })
         })
     },

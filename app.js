@@ -18,7 +18,6 @@ app.use("/api/admin/",adminRouter);
 app.use("/item_image", express.static('upload/images'))
 app.use("/api/user/",userRouter)
 app.use('/otp/',mailRouter)
-// app.use("/register", express.static('upload/images'))
 const port = process.env.PORT || 8000;
 
 
