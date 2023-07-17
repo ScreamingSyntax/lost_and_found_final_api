@@ -46,7 +46,6 @@ module.exports = {
         pool.query("SELECT * FROM `items` JOIN claim ON items.item_id = claim.item_id WHERE claim.claim_status=? order by items.item_id",
         [data.status],
         (err,result,field)=>{
-           
             if(err){
                 return callBack(err,null);
             }
@@ -111,7 +110,8 @@ module.exports = {
         )
     },
     approveItemsService:(data,callBack)=>{
-        pool.query(`UPDATE claim
+        pool.query(`
+        UPDATE claim
         SET claim_status = 
             CASE
                 WHEN claim_id = ? AND item_id = ? THEN 'Approved'
@@ -131,8 +131,7 @@ module.exports = {
     },
     rejectItemsService:(data,callBack)=>{
         pool.query(`UPDATE claim
-        SET claim_status = 'Rejected' where claim_id=? and item_id=?
-        `,
+        SET claim_status = 'Rejected' where claim_id=? and item_id=?`,
         [data.claim_id,data.item_id],
         (err,result,fields)=>{
           
@@ -140,6 +139,53 @@ module.exports = {
                 return callBack(err,null)
             }
             return callBack(null,result)
+        }
+        );
+    },
+    showReportsService:(callBack)=>{
+        pool.query("SELECT * FROM report",
+        [],
+        (err,result)=>{
+            console.log(err)
+            if (err){
+                return callBack(err,null)
+            }
+            return callBack(null,result)
+        }
+        );
+    },
+    detailedReportViewService:(data,callBack)=>{
+        pool.query('SELECT * FROM report where report_id=?',
+        [data.report_id],
+        (err,result)=>{
+            if(err){
+                return callBack(err,null);
+            }
+            return callBack(null,result);
+        }
+        );
+    },
+    adminLoginService:(data,callBack)=>{
+        console.log(data)
+        pool.query("SELECT * FROM admin_lost where user_name=?",
+        [data.user_name],
+        (err,result)=>{
+            if(err){
+                return callBack(err,null)
+            }
+            return callBack(null,result)
+        }
+        )
+    },
+    searchReportViewService:(data,callBack)=>{
+        console.log(data.reported_by)
+        pool.query("SELECT * from report where reported_by LIKE ?",
+        [`%${data.reported_by}%`],
+        (err,result)=>{
+            if(err){
+                return callBack(err,null);
+            }
+            return callBack(null,result);
         }
         )
     }

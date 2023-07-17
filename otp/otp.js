@@ -13,7 +13,8 @@ require('dotenv').config()
 otpFun = () => {
   var email;
   var otp = Math.random();
-  otp = otp * 1000000;
+  otp = otp * 1000000 + 1;
+  // console.log()
   otp = parseInt(otp);
   return otp;
 } 
@@ -29,7 +30,7 @@ let transporter = nodemailer.createTransport({
     }
     
 });
-    
+
 router.post('/send',function(req,res){
     email=req.body.email;
     userName=req.body.name;
@@ -39,7 +40,6 @@ router.post('/send',function(req,res){
         "SELECT * FROM otp_data where email=? and name=?",
         [email,userName],
         (err,result,field)=>{
-            
             if(result.length==0){
                 pool.query("INSERT into otp_data(email,otp,name) values (?,?,?)",
                 [email,otp,userName])
@@ -59,91 +59,100 @@ router.post('/send',function(req,res){
        <!DOCTYPE html>
 <html>
 <head>
-  <title>Lost and Found Application  - Team Elevate</title>
+  <title>Lost and Found Application - Team Elevate</title>
   <style>
     body {
-      font-family: Arial, sans-serif;
+      font-family: 'Poppins', sans-serif;
       background-color: #f5f5f5;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
     }
-    
+
     .container {
-      max-width: 600px;
-      margin: 0 auto;
-      padding: 20px;
+      max-width: 500px;
+      padding: 40px;
       background-color: #ffffff;
       border-radius: 5px;
       box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+      text-align: center;
     }
-    
+
     h1 {
-      color: #333333;
-      font-size: 24px;
-      font-weight: bold;
+      color: #3498db;
+      font-size: 30px;
       margin-top: 0;
     }
-    
+    h3{
+      color: #3498db;
+      font-size: 15px;
+      margin: 20 0;
+    }
     p {
       color: #777777;
       font-size: 16px;
+      line-height: 1.5;
       margin-bottom: 20px;
     }
-    
-    .link {
+
+    .otp-container {
+      background-color: #f5f5f5;
+      border: 2px solid #3498db;
+      border-radius: 5px;
+      padding: 10px;
       display: inline-block;
-      margin-right: 10px;
+    }
+
+    .otp {
+      font-weight: bold;
+      color: #3498db;
+      font-size: 24px;
+    }
+
+    .link {
       color: #3498db;
       text-decoration: none;
+      transition: color 0.3s ease;
     }
-    
+
     .link:hover {
-      text-decoration: underline;
+      color: #ff7f50;
     }
-    
+
     .social-icons {
       margin-top: 20px;
+      display: flex;
+      justify-content: center;
     }
-    
+
     .social-icons a {
       display: inline-block;
       margin-right: 10px;
-      width: 30px;
-      height: 30px;
-      line-height: 30px;
+      width: 40px;
+      height: 40px;
+      line-height: 40px;
       text-align: center;
       border-radius: 50%;
       background-color: #3498db;
       color: #ffffff;
       text-decoration: none;
     }
+
   </style>
+
 </head>
 <body>
-<div class="container">
-  <h1>Lost and Found Application - Team Elevate</h1>
+<div class="container fade-in scale-in">
+  <h1>Lost and Found</h1>
   <p>
-    Dear User,<br>
-    <br>
-    Thank you for choosing our Lost and Found application developed by Team Elevate from Itahari International College. We are dedicated to helping you find your lost belongings and reconnect with your valuable items.<br>
-    <br>
-    Your One-Time Password (OTP) for registration is:<br>
-    <br>
-    <span class="otp">${otp}</span><br>
-    <br>
-    Our application provides a user-friendly interface for reporting lost items and searching for found items. We aim to provide a seamless experience to our users and ensure a high success rate in reuniting lost items with their rightful owners.<br>
-    <br>
-    Stay connected with us and get the latest updates by following our social media channels:<br>
-    <br>
-    <a class="link" href="https://www.facebook.com/team-elevate">Facebook</a>
-    <a class="link" href="https://twitter.com/team-elevate">Twitter</a>
-    <a class="link" href="https://www.instagram.com/team-elevate">Instagram</a>
+    Thank you for choosing our Lost and Found application developed by Team Elevate from Itahari International College. We are dedicated to helping you find your lost belongings and reconnect with your valuable items.
   </p>
-  <div class="social-icons">
-    <a href="https://www.facebook.com/team-elevate">&#xf09a;</a>
-    <a href="https://twitter.com/team-elevate">&#xf099;</a>
-    <a href="https://www.instagram.com/team-elevate">&#xf16d;</a>
+  <h3>YOUR OTP :</h3>
+  <div class="otp-container">
+    <span class="otp">${otp}</span>
   </div>
 </div>
-
 </body>
 </html>
        `
@@ -168,7 +177,6 @@ router.post('/verify', function (req, res) {
   const email = req.body.email;
   const otp = req.body.otp;
   const item_id = req.body.item_id;
-
   const userName = req.body.userName;
 
   fetchDateTime().then((value)=>{
@@ -185,7 +193,6 @@ router.post('/verify', function (req, res) {
     "SELECT otp FROM otp_data WHERE email=? AND name=?",
     [email, userName],
     (err, result, field) => {
-      console.log(result)
       if (err) {
         return res.json({
           success: 0,
@@ -194,21 +201,43 @@ router.post('/verify', function (req, res) {
       }
       if (result.length > 0 && result[0].otp == otp) {
         pool.query(
-          "INSERT INTO claim (item_id, claimed_by, claimed_by_email, claim_status,claimed_date) VALUES (?, ?, ?, ?,?)",
-          [item_id, userName, email, "Pending",current_date],
-          (err, result, fields) => {
-            if (err) {
-              return res.json({
-                success: 0,
-                message: "Error claiming particular item"
-              });
-            }
-            return res.json({
-              success: 1,
-              message: "Your request is pending, please visit SSD"
-            });
+          "SELECT * FROM claim where claimed_by_email=? and claimed_by=? and item_id=?",
+          [email,userName,item_id],
+          (err,result,field)=>{  
+            console.log(`Claimed Bro`,result)
+              if(!result[0]){
+                pool.query(
+                  "INSERT INTO claim (item_id, claimed_by, claimed_by_email, claim_status,claimed_date) VALUES (?, ?, ?, ?,?)",
+                  [item_id, userName, email, "Pending",current_date],
+                  (err, result, fields) => {
+                    if (err) {
+                      return res.json({
+                        success: 0,
+                        message: "Error claiming particular item"
+                      });
+                    }
+                    return res.json({
+                      success: 1,
+                      message: "Your request is pending, please visit SSD"
+                    });
+                  }
+                );
+              }
+              else{
+                return res.json({
+                  success:0,
+                  message:"You have already claimed the item"
+                })
+              }              
+              // if(result.length!=0){
+              //     pool.query("UPDATE otp_data set otp=? where email=? and name=?",
+              //     [otp,email,userName]
+              //     )
+              // }
           }
-        );
+      )
+
+        
       } else {
         return res.json({
           success: 0,
@@ -221,4 +250,4 @@ router.post('/verify', function (req, res) {
 })
 });
 
-module.exports = router
+module.exports = {router,transporter}

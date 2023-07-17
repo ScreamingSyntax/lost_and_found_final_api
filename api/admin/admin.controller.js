@@ -1,8 +1,10 @@
-const { viewProduct: viewProductService, addItem: addItemService, removeItem: removeItemService, updateItemName: updateItemNameService, approveItemsService, sortByStatus, rejectItemsService, searchProductService, searchUnclaimedProductService } = require("./admin.service");
+const { viewProduct: viewProductService, addItem: addItemService, removeItem: removeItemService, updateItemName: updateItemNameService, approveItemsService, sortByStatus, rejectItemsService, searchProductService, searchUnclaimedProductService,getAdminService, getParticularAdminDetails,showReportsService,detailedReportViewService,searchReportViewService, adminLoginService,} = require("./admin.service");
 const { json } = require("body-parser");
+const {sign} = require('jsonwebtoken')
 const { fs } = require("node:fs");
 const { unlink } = require('node:fs');
 const cloudinary = require("../../config/cloudinary")
+
 
 const deleteImage = (filePath, imageName) => {
     unlink('upload/images/' + imageName, (err) => {
@@ -12,6 +14,7 @@ const deleteImage = (filePath, imageName) => {
 }
 
 module.exports = {
+
     viewProduct: (req, res) => {
         viewProductService((err, results) => {
 
@@ -144,9 +147,7 @@ module.exports = {
     },
     approveItemController: (req, res) => {
         const data = req.body;
-
         approveItemsService(data, (err, results) => {
-
             if (err) {
                 return res.json({
                     success: 0,
@@ -161,7 +162,6 @@ module.exports = {
     },
     rejectItemController: (req, res) => {
         const data = req.body;
-
         rejectItemsService(data, (err, results) => {
             if (err) {
                 return res.json({
@@ -175,4 +175,85 @@ module.exports = {
             })
         })
     },
+    adminLoginController:(req,res)=>{
+        const data = req.body;
+
+        adminLoginService(data,(err,results)=>{
+           console.log(results)
+            if(err){
+                return res.json({
+                    success:0,
+                    message:"Server Error"
+                })
+            }
+            if(results.length == 0){
+                return res.json({
+                    success:0,
+                    message:"Invalid Credentials"
+                })
+            }
+            const jsontoken = sign({ result: results }, process.env.KEY, {
+                expiresIn: "24h",
+              });
+            if(results[0].username == data.username && results[0].password == data.password){
+                return res.json({
+                    success:1,
+                    message:"Successfully Logged :)",
+                    token:jsontoken
+                })
+            }
+            else{
+                return res.json({
+                    success:0,
+                    message:"Invalid Credentials"
+                })
+            }
+        })
+    },
+    showReportController:(req,res)=>{
+        showReportsService((err,results)=>{
+            if(err){
+               return res.json({
+                    success:0,
+                    message:"Error Fetching Items"
+                })
+            }
+            return res.json({
+                success:1,
+                data: results  
+            })
+        })
+    },
+    detailedReportController:(req,res)=>{
+        const data = req.body;
+        detailedReportViewService(data,(err,results)=>{
+            if(err){
+                return res.json({
+                    success:0,
+                    message:"Error Fetching Particular Report"
+                })
+            }
+            return res.json({
+                success:1,
+                data:results
+            })
+        })
+    },
+    searchReportViewController:(req,res)=>{
+        const data=req.body;
+        console.log(data)
+        searchReportViewService(data,(err,results)=>{
+            if(err){
+                return res.json({
+                    success:0,
+                    message:"Error Fetching Particular Report"
+                })
+            }
+            return res.json({
+                success:1,
+                data:results
+            })
+        })
+    },
+    
 };

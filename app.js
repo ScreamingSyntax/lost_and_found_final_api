@@ -10,7 +10,7 @@ app.use(cors({
 }))
 const userRouter = require('./api/user/user.router');
 const adminRouter = require('./api/admin/admin.router');
-const mailRouter = require('./otp/otp');
+const {router:mailRouter} = require('./otp/otp');
 const { resolve } = require("path");
 const { rejects } = require("assert");
 app.use(express.json());
