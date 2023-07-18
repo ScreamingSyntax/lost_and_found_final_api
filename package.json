@@ -1,0 +1,37 @@
+{
+  "name": "lost_and_found",
+  "version": "1.0.0",
+  "description": "This is the api for lost and found application used by Itahari International College",
+  "main": "app.js",
+  "scripts": {
+    "start": "node app.js",
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "build":"nodemon"
+  },
+  "engines": {
+    "node": "v20.4.0"
+  },
+  "author": "Elevate",
+  "license": "ISC",
+  "dependencies": {
+    "axios": "^1.4.0",
+    "cloudinary": "^1.37.3",
+    "cors": "^2.8.5",
+    "dotenv": "^16.3.1",
+    "express": "^4.18.2",
+    "fs": "^0.0.1-security",
+    "json": "^11.0.0",
+    "jsonwebtoken": "^9.0.1",
+    "moment": "^2.29.4",
+    "moment-timezone": "^0.5.43",
+    "multer": "^1.4.5-lts.1",
+    "multer-storage-cloudinary": "^4.0.0",
+    "mysql2": "^3.3.1",
+    "nodemailer": "^6.9.3",
+    "nodemon": "^3.0.1",
+    "path": "^0.12.7",
+    "pm2": "^4.2.3",
+    "yarn": "^1.22.19"
+  },
+  "packageManager": "yarn@3.6.1"
+}
