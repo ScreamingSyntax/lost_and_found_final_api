@@ -93,15 +93,24 @@ module.exports = {
         console.log(req.body)
         data = req.body
         send_otp = req.body.otp
-        let date;
-        fetchDateTime().then((value) => {
-            if (value == false) {
-                return res.json({
-                    success: 0,
-                    message: "Server Error d/t"
-                })
-            }
-            current_date = moment(value).format("YYYY-MM-DD");
+      
+        function getCurrentDateInKathmandu() {
+            // Create a Date object for the current date and time in the user's local time zone
+            const localDate = new Date();
+          
+            // Convert the local date to Kathmandu time zone (NST: UTC offset +5:45 hours)
+            const options = {
+              timeZone: 'Asia/Kathmandu',
+              year: 'numeric',
+              month: '2-digit',
+              day: '2-digit',
+            };
+          
+            // Format the date as a string in the Kathmandu time zone
+            const kathmanduDate = localDate.toLocaleString('en-GB', options);
+            return kathmanduDate;
+          }
+          const date= getCurrentDateInKathmandu()
             verifyReportService(data, (err, results) => {
                 if (err) {
                     return res.json({
@@ -110,7 +119,7 @@ module.exports = {
                     })
                 }
                 if (send_otp == results[0].otp) {
-                    addReportService(data, current_date, (err, results) => {
+                    addReportService(data, date, (err, results) => {
                         if (err) {
                             return res.json({
                                 success: 0,
@@ -232,7 +241,7 @@ module.exports = {
                         message: "Wrong Otp"
                     })
                 }
-            })
+
 
         });
     }

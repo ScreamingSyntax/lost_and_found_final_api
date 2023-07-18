@@ -178,23 +178,30 @@ router.post('/send',function(req,res){
 });
 
 router.post('/verify', function (req, res) {
+  function getCurrentDateInKathmandu() {
+    // Create a Date object for the current date and time in the user's local time zone
+    const localDate = new Date();
   
+    // Convert the local date to Kathmandu time zone (NST: UTC offset +5:45 hours)
+    const options = {
+      timeZone: 'Asia/Kathmandu',
+      year: 'numeric',
+      month: '2-digit',
+      day: '2-digit',
+    };
+  
+    // Format the date as a string in the Kathmandu time zone
+    const kathmanduDate = localDate.toLocaleString('en-GB', options);
+    return kathmanduDate;
+  }
+  date = getCurrentDateInKathmandu();
+  console.log(`this is date`,date)
   console.log(req.body)
   const email = req.body.email;
   const otp = req.body.otp;
   const item_id = req.body.item_id;
   const userName = req.body.userName;
 
-  fetchDateTime().then((value)=>{
- console.log(value)
-  if (value == false){
-      return res.json({
-          success:0,
-          message:"Server Error d/t"
-      })
-  }
-  // date = 
-  current_date = moment(value).format("YYYY-MM-DD");
   pool.query(
     "SELECT otp FROM otp_data WHERE email=? AND name=?",
     [email, userName],
@@ -214,7 +221,7 @@ router.post('/verify', function (req, res) {
               if(!result[0]){
                 pool.query(
                   "INSERT INTO claim (item_id, claimed_by, claimed_by_email, claim_status,claimed_date) VALUES (?, ?, ?, ?,?)",
-                  [item_id, userName, email, "Pending",current_date],
+                  [item_id, userName, email, "Pending",date],
                   (err, result, fields) => {
                     if (err) {
                       return res.json({
@@ -253,7 +260,7 @@ router.post('/verify', function (req, res) {
     }
   );
       
-})
+
 });
 
 module.exports = {router,transporter}
