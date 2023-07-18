@@ -17,7 +17,7 @@ module.exports = {
         )
     },
     searchProductService :(data,callBack)=>{
-        pool.query("SELECT * FROM items where item_id in (SELECT item_id FROM claim where claim_status=?) and item_name LIKE ?",
+        pool.query("SELECT * FROM `items` JOIN claim ON items.item_id = claim.item_id WHERE claim.claim_status=? and item_name like ? order by items.item_id",
         [data.status,`%${data.item_name}%`],
         (err,result,field)=>{
             if (err){

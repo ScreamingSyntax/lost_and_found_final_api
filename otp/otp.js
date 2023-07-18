@@ -35,7 +35,13 @@ router.post('/send',function(req,res){
     email=req.body.email;
     userName=req.body.name;
     var otp = otpFun();
-    
+    const pattern = /^[a-zA-Z0-9-]+\@iic\.edu\.np$/;
+    if (!pattern.test(email)) {
+      return res.json({
+        success:0,
+        message:"Use your college email(@iic.edu.np)"
+      })
+    }
     pool.query(
         "SELECT * FROM otp_data where email=? and name=?",
         [email,userName],
@@ -151,6 +157,7 @@ router.post('/send',function(req,res){
   <h3>YOUR OTP :</h3>
   <div class="otp-container">
     <span class="otp">${otp}</span>
+    <a href="tel:${otp}">Copy this number</a>
   </div>
 </div>
 </body>

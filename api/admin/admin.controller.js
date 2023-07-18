@@ -91,10 +91,11 @@ module.exports = {
         const data = req.body;
         const imageName =req.file.filename;
         await cloudinary.v2.uploader.upload(imageUrl,
-         { public_id: "olympic_flag" }, 
-        function(error, result)
+         { public_id: `$this is ${imageName}` }, 
+            function(error, result)
          {
-            filePath = result.secure_url; 
+            console.log(result)
+            filePath = result.url; 
         });
         addItemService(data, filePath, (err, results) => {
             if (err) {
