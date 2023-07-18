@@ -11,7 +11,7 @@ async function fetchDateTime()
        return datetime
       }
        catch (error) {
-       console.error('Error fetching date and time:', error.message);
+       console.error('Server Error d/t:', error.message);
        return false;
       }
   }

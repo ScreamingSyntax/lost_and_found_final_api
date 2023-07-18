@@ -21,7 +21,7 @@ module.exports = {
             if (err) {
                 return res.json({
                     success: 0,
-                    message: "Error Fetching Data"
+                    message: "Server Error v/p"
                 });
             }
             return res.json({
@@ -68,7 +68,7 @@ module.exports = {
             if (err) {
                 return res.json({
                     success: 0,
-                    message: "Error Fetching Data"
+                    message: "Server Error"
                 });
             }
             return res.json({
@@ -216,7 +216,7 @@ module.exports = {
             if(err){
                return res.json({
                     success:0,
-                    message:"Error Fetching Items"
+                    message:"Server Error"
                 })
             }
             return res.json({
@@ -231,7 +231,7 @@ module.exports = {
             if(err){
                 return res.json({
                     success:0,
-                    message:"Error Fetching Particular Report"
+                    message:"Server Error"
                 })
             }
             return res.json({
@@ -247,7 +247,7 @@ module.exports = {
             if(err){
                 return res.json({
                     success:0,
-                    message:"Error Fetching Particular Report"
+                    message:"Server Error"
                 })
             }
             return res.json({
