@@ -12,7 +12,7 @@ module.exports = {
             if (err) {
                 return res.json({
                     success: 0,
-                    message: "Error Fetching Items"
+                    message: "Server Error"
                 })
             }
             return res.json({
@@ -26,7 +26,7 @@ module.exports = {
             if (err) {
                 return res.json({
                     success: 0,
-                    message: "Error Fetching Data"
+                    message: "Server Error"
                 })
             }
             return res.json({
@@ -40,7 +40,7 @@ module.exports = {
             if (err) {
                 return res.json({
                     success: 0,
-                    message: "Error Fetching Data"
+                    message: "Server Error"
                 })
             }
             return res.json({
@@ -56,7 +56,7 @@ module.exports = {
             if (value == false) {
                 return res.json({
                     success: 0,
-                    message: "Error fetching date and time"
+                    message: "Server Error d/t"
                 })
             }
             current_date = moment(value).format("YYYY-MM-DD");

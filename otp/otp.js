@@ -186,11 +186,11 @@ router.post('/verify', function (req, res) {
   const userName = req.body.userName;
 
   fetchDateTime().then((value)=>{
- 
+ console.log(value)
   if (value == false){
       return res.json({
           success:0,
-          message:"Error fetching date and time"
+          message:"Server Error d/t"
       })
   }
   // date = 
