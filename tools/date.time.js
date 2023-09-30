@@ -1,19 +1,8 @@
-const axios = require('axios');
+const fs = require('fs');
+const currentDate = new Date();
+const year = currentDate.getFullYear();
+const month = String(currentDate.getMonth() + 1).padStart(2, '0'); // Month is zero-based, so add 1
+const day = String(currentDate.getDate()).padStart(2, '0');
+const formattedDate = `${year}-${month}-${day}`;
 
-let date;
-let time;
-//a
-async function fetchDateTime()
- {
-    try {
-       const response = await axios.get('http://worldtimeapi.org/api/timezone/Asia/Kathmandu');
-       const { datetime } = response.data;
-       return datetime
-      }
-       catch (error) {
-       console.error('Server Error d/t:', error.message);
-       return false;
-      }
-  }
-module.exports = {fetchDateTime}
-
+module.exports = {formattedDate}

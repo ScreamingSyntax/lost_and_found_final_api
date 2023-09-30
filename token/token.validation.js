@@ -6,10 +6,11 @@ module.exports={
         let token = req.get("authorization");
         if(token){
           token = token.slice(7);
+          console.log(token)
           verify(token,process.env.KEY,(err,decoded)=>{
             if(err){
                 res.json({
-                    sucess:0,
+                    success:0,
                     message: "Invalid Token"
                 })
             }
@@ -20,7 +21,7 @@ module.exports={
         }
         else{
             res.json({
-                sucess:0,
+                success:0,
                 message:"Access Denied!  unauthorized user"
             })
         }

@@ -143,7 +143,7 @@ module.exports = {
         );
     },
     showReportsService:(callBack)=>{
-        pool.query("SELECT * FROM report",
+        pool.query("select users.userName, users.email, report.lost_location, report.report_title, report_description, report.report_date, report.is_found from users right join report on users.userID = report.userID order by is_found",
         [],
         (err,result)=>{
             console.log(err)
@@ -166,10 +166,11 @@ module.exports = {
         );
     },
     adminLoginService:(data,callBack)=>{
-        console.log(data)
+        // console.log(data)
         pool.query("SELECT * FROM admin_lost where user_name=?",
         [data.user_name],
         (err,result)=>{
+            // console.log(`Asli data ${result}`)
             if(err){
                 return callBack(err,null)
             }
@@ -188,6 +189,38 @@ module.exports = {
             return callBack(null,result);
         }
         )
-    }
+    },
+    viewReportCategoriesService:(callBack)=>{
+        pool.query("SELECT * from lost_category",
+        [],
+        (err,result)=>{
+            if(err){
+                return callBack(err,null);
+            }
+            return callBack(null,result);
+        })
+    },
+    viewSpecificCategoriesService:(type,callBack)=>{
+        pool.query("Select * from lost_category where type = ?",
+        [type],
+        (err,result)=>{
+            if(err){
+                return callBack(err,null)
+            }
+            return callBack(null,result)
+        }
+        )
+    },
+    addCategoriesService:(data,callBack)=>{
+        pool.query("INSERT into lost_category(type) values (?) ",
+        [data.type],
+        (err,result)=>{
+            console.log(err)
+            if(err){
+                return callBack(err,null);
+            }
+            return callBack(null,result);
+        });
+    },
 }
 

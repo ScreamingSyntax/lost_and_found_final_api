@@ -8,7 +8,6 @@ const { fetchDateTime } = require('../tools/date.time');
 moment.tz.setDefault("Asia/Kathmandu");
 require('dotenv').config()
 
-// let checkOtp;
 
 otpFun = () => {
   var email;
@@ -33,7 +32,8 @@ let transporter = nodemailer.createTransport({
 
 router.post('/send',function(req,res){
     email=req.body.email;
-    userName=req.body.name;
+    userName=req.body.username;
+    console.log(req.body)
     var otp = otpFun();
     const pattern = /^[a-zA-Z0-9-]+\@iic\.edu\.np$/;
     if (!pattern.test(email)) {
@@ -46,9 +46,13 @@ router.post('/send',function(req,res){
         "SELECT * FROM otp_data where email=? and name=?",
         [email,userName],
         (err,result,field)=>{
+            console.log(otp)
             if(result.length==0){
                 pool.query("INSERT into otp_data(email,otp,name) values (?,?,?)",
-                [email,otp,userName])
+                [email,otp,userName],(err,results)=>{
+                  console.log(err);
+                  console.log(results)
+                })
             }
             
             if(result.length!=0){
@@ -144,9 +148,7 @@ router.post('/send',function(req,res){
       color: #ffffff;
       text-decoration: none;
     }
-
   </style>
-
 </head>
 <body>
 <div class="container fade-in scale-in">
@@ -179,18 +181,13 @@ router.post('/send',function(req,res){
 
 router.post('/verify', function (req, res) {
   function getCurrentDateInKathmandu() {
-    // Create a Date object for the current date and time in the user's local time zone
     const localDate = new Date();
-  
-    // Convert the local date to Kathmandu time zone (NST: UTC offset +5:45 hours)
     const options = {
       timeZone: 'Asia/Kathmandu',
       year: 'numeric',
       month: '2-digit',
       day: '2-digit',
     };
-  
-    // Format the date as a string in the Kathmandu time zone
     const kathmanduDate = localDate.toLocaleString('en-GB', options);
     return kathmanduDate;
   }

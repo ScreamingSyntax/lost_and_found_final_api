@@ -1,13 +1,109 @@
-const { viewItemsService, claimItemsService, claimItemService, searchProductService, verifyReportService, addReportService, viewProductByDate, viewProductByName } = require('./user.service')
-const { fetchDateTime } = require('../../tools/date.time')
+const { viewItemsService,verifyOtpService, claimItemsService, searchItemSortByDateService,searchItemSortByNameService,claimItemService, searchProductService, verifyReportService, addReportService, viewProductByDate, viewProductByName,loginUserService,registerUserService, getUserByEmailService,viewReportService,lostItemFoundService,viewReportCategoriesService} = require('./user.service')
+const { formattedDate } = require('../../tools/date.time')
 const moment = require("moment-timezone");
 const pool = require('../../config/database');
 moment.tz.setDefault("Asia/Kathmandu");
 const{ transporter} = require('../../otp/otp')
+const {sign} = require('jsonwebtoken')
 
-module.exports = {
+module.exports ={
+    registerUserController:(req,res)=>{
+        const data = req.body;
+        console.log(data)
+        if(data.password != data.password2){
+            return res.json({
+                success:0,
+                message:"The passwords donot match"
+            })
+        }
+        getUserByEmailService(data.email,(err,results)=>{
+            if(err){
+                return res.json({
+                    success:0,
+                    message:"Server Error"
+                })
+            }
+
+            if (results[0] === undefined){
+                verifyOtpService(data,(err,results)=>{
+                    if(err){
+                        return res.json({
+                            success:0,
+                            message:"Server Error"
+                        })
+                    }
+                    console.log(results)
+                    if (results[0] === undefined || results[0].otp != data.otp){
+                        return res.json({
+                            success:0,
+                            message:"Wrong Otp"
+                        })
+                    }
+                    registerUserService(data,(err,results)=>{
+                        if(err){
+                            return res.json({
+                                success:0,
+                                message:"Server Error"
+                            })
+                        }
+                        return res.json({
+                            success:1,
+                            message:"Successfully Registered :)"
+                        })
+                    })
+                })  
+            }
+            else{
+                return res.json({
+                    success:0,
+                    message:"The user already exists :)"
+                })
+            }
+        })
+       
+    },
+    tokenCheckerController:(req,res)=>{
+        return res.json({
+            success:1,
+            message:"Token GUD"
+        })
+    },
+    loginUserController:(req,res)=>{
+        const data = req.body;
+        console.log(data.email)
+        loginUserService(data,(err,results)=>{
+            const jsontoken = sign({ result: results }, process.env.KEY, {
+                expiresIn: "30d",
+              });
+            results = results[0]
+            if(err){
+                return res.json({
+                    success:0,
+                    message:"Server Error"
+                })
+            }
+            if(data.email != results.email){
+                return res.json({
+                    success:0,
+                    message:"The email doesn't exist"
+                })
+            }
+            if(data.password != results.password){
+                return res.json({
+                    success:0,
+                    message:"The credentials donot match"
+                })
+            }
+            return res.json({
+                success:1,
+                message:"Successfully logged in",
+                token:jsontoken
+            })
+        })
+    },
     viewItemController: (req, res) => {
         const data = req.body;
+        console.log(data)
         viewItemsService(data, (err, results) => {
             if (err) {
                 return res.json({
@@ -51,28 +147,33 @@ module.exports = {
     },
     claimByUserController: (req, res) => {
         const data = req.body;
-        console.log(`This is requested`,data)
-        fetchDateTime().then((value) => {
-            if (value == false) {
-                return res.json({
-                    success: 0,
-                    message: "Server Error d/t"
-                })
-            }
-            current_date = moment(value).format("YYYY-MM-DD");
-            claimItemService(data, current_date, (err, results) => {
-                if (err) {
+        console.log(data);
+            getUserByEmailService(data.claimed_by_email,(err,result)=>{
+                if(err){
                     return res.json({
-                        success: 0,
-                        message: "Server Issue"
+                        success:0,
+                        message:"Server Issue"
                     })
                 }
-                return res.json({
-                    success: 1,
-                    message: "Your request is pending, Please visit SSD"
+                if(result[0] === undefined){
+                    return res.json({
+                        success:0,
+                        message:"Sorry that email doesn't exist"
+                    })
+                }
+                claimItemService(data,  formattedDate, result[0].userName,(err, results) => {
+                    if (err) {
+                        return res.json({
+                            success: 0,
+                            message: "Server Issue"
+                        });
+                    }
+                    return res.json({
+                        success: 1,
+                        message: "Your request is pending, Please visit SSD"
+                    });
                 })
             })
-        })
     },
     searchProductController: (req, res) => {
         const data = req.body;
@@ -89,160 +190,113 @@ module.exports = {
             })
         })
     },
+    searchedItemsSortByNameController:(req,res)=>{
+        const data = req.body;
+        console.log(data)
+        searchItemSortByNameService(data,(err,results)=>{
+            if(err){
+                return res.json({
+                    success:0,
+                    message:"Server Issue"
+                })
+            }
+            return res.json({
+                success:1,
+                data:results
+            })
+        })
+        
+    },
+    searchedItemsSortByDateController:(req,res)=>{
+        const data = req.body;
+        console.log(data)
+        searchItemSortByDateService(data,(err,results)=>{
+            if(err){
+                return res.json({
+                    success:0,
+                    message:"Server Issue"
+                })
+            }
+            return res.json({
+                success:1,
+                data:results
+            })
+        })
+        
+    },
+    viewReportController:(req,res) =>{
+        data = req.body;
+        console.log(data);
+        viewReportService(data,(err,result)=>{
+            if(err){
+                return res.json({
+                    success:0,
+                    message:"Server Issue"
+                })
+            }
+            return res.json({
+                success:1,
+                data:result
+            })
+        })
+    },
     addReportController: (req, res) => {
         console.log(req.body)
         data = req.body
-        send_otp = req.body.otp
-      
-        function getCurrentDateInKathmandu() {
-            // Create a Date object for the current date and time in the user's local time zone
-            const localDate = new Date();
-          
-            // Convert the local date to Kathmandu time zone (NST: UTC offset +5:45 hours)
-            const options = {
-              timeZone: 'Asia/Kathmandu',
-              year: 'numeric',
-              month: '2-digit',
-              day: '2-digit',
-            };
-          
-            // Format the date as a string in the Kathmandu time zone
-            const kathmanduDate = localDate.toLocaleString('en-GB', options);
-            return kathmanduDate;
-          }
-          const date= getCurrentDateInKathmandu()
-            verifyReportService(data, (err, results) => {
-                if (err) {
+        const date= formattedDate;
+        getUserByEmailService(data.email,(err,result)=>{
+            if(err){
+                return res.json({
+                    success:0,
+                    message:"Server Issue"
+                })
+            }
+            // console.log(result[]);
+            result = result[0]
+            addReportService(result.userID,date,data,(err,result)=>{
+                if(err){
                     return res.json({
-                        success: 0,
-                        message: "Server Error vrs"
+                        success:0,
+                        message:"Server Issue"
                     })
                 }
-                if (send_otp == results[0].otp) {
-                    addReportService(data, date, (err, results) => {
-                        if (err) {
-                            return res.json({
-                                success: 0,
-                                message: "Server Isssue ars"
-                            })
-                        }
-                        var mailOptions={
-                            to: req.body.email,
-                            subject: "Otp for registration is: ",
-                            html: `
-                            <!DOCTYPE html>
-                     <html>
-                     <head>
-                       <title>Lost and Found Application - Team Elevate</title>
-                       <style>
-                         body {
-                           font-family: 'Poppins', sans-serif;
-                           background-color: #f5f5f5;
-                           display: flex;
-                           align-items: center;
-                           justify-content: center;
-                           min-height: 100vh;
-                         }
-                     
-                         .container {
-                           max-width: 500px;
-                           padding: 40px;
-                           background-color: #ffffff;
-                           border-radius: 5px;
-                           box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-                           text-align: center;
-                         }
-                     
-                         h1 {
-                           color: #3498db;
-                           font-size: 30px;
-                           margin-top: 0;
-                         }
-                         h3{
-                           color: #3498db;
-                           font-size: 15px;
-                           margin: 20 0;
-                         }
-                         p {
-                           color: #777777;
-                           font-size: 16px;
-                           line-height: 1.5;
-                           margin-bottom: 20px;
-                         }
-                     
-                         .otp-container {
-                           background-color: #f5f5f5;
-                           border: 2px solid #3498db;
-                           border-radius: 5px;
-                           padding: 10px;
-                           display: inline-block;
-                         }
-                     
-                         .otp {
-                           font-weight: bold;
-                           color: #3498db;
-                           font-size: 24px;
-                         }
-                     
-                         .link {
-                           color: #3498db;
-                           text-decoration: none;
-                           transition: color 0.3s ease;
-                         }
-                     
-                         .link:hover {
-                           color: #ff7f50;
-                         }
-                     
-                         .social-icons {
-                           margin-top: 20px;
-                           display: flex;
-                           justify-content: center;
-                         }
-                     
-                         .social-icons a {
-                           display: inline-block;
-                           margin-right: 10px;
-                           width: 40px;
-                           height: 40px;
-                           line-height: 40px;
-                           text-align: center;
-                           border-radius: 50%;
-                           background-color: #3498db;
-                           color: #ffffff;
-                           text-decoration: none;
-                         }
-                     
-                       </style>
-                     
-                     </head>
-                     <body>
-                     <div class="container fade-in scale-in">
-                       <h1>Lost and Found</h1>
-                       <p>
-                         Thank you for choosing our Lost and Found application developed by Team Elevate from Itahari International College. We are dedicated to helping you find your lost belongings and reconnect with your valuable items.
-                         Your report has been successfully submitted! We will contact you as soon as we get any information about this.
-                       </p>
-                     </div>
-                     </body>
-                     </html>
-                            `
-                          };
-                          transporter.sendMail(mailOptions, (error, info) => {});
-                        return res.json({
-                            success: 1,
-                            message: "Successfully Added Report"
-                        })
-                    })
-                }
-                if (send_otp != results[0].otp) {
-                    return res.json({
-                        success: 0,
-                        message: "Wrong Otp"
-                    })
-                }
+                return res.json({
+                    success:1,
+                    message:"Report Added"
+                })
+            });
+        })
+    },
+    lostItemFoundController:(req,res)=>{
+        const data = req.body;
+        console.log(data)
+        lostItemFoundService(data,(err,results)=>{
+            if(err){
+                return res.json({
+                    success:0,
+                    message:"Server Issue"
+                })
+            }
+            return res.json({
+                success:1,
+                message:"That's Good"
+            })
 
-
-        });
-    }
+        })
+    },
+    viewReportCategoriesController:(req,res)=>{
+        console.log("ada")
+        viewReportCategoriesService((err,results)=>{
+            if(err){
+                return res.json({
+                    success:0,
+                    message:"Server Error"
+                })
+            }
+            return res.json({
+                success:0,
+                data:results
+            })
+        })
+    },
 }
