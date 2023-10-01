@@ -59,8 +59,8 @@ module.exports={
         )
     },
     loginUserService:(data,callBack)=>{
-        pool.query("Select email,password from users",
-        [data.email,data.password],
+        pool.query("Select email,password from users where email = ?",
+        [data.email],
         (err,result)=>{
             if(err){
                 return callBack(err,null);

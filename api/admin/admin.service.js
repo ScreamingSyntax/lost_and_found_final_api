@@ -25,9 +25,7 @@ module.exports = {
             }
             else{
                 return callBack(null,result)
-            }
-        }
-        )
+            }})
     },
     searchUnclaimedProductService :(data,callBack)=>{
         pool.query("SELECT * FROM items WHERE item_id NOT IN (SELECT item_id FROM claim WHERE claim_status = 'Approved' or claim_status='Pending') and item_name LIKE ?",
@@ -222,5 +220,16 @@ module.exports = {
             return callBack(null,result);
         });
     },
+    sendMailToCategory:(data,callBack)=>{
+        pool.query("select distinct users.email from users join report on users.userID=report.userID where report.report_title= ? and report.is_found=0 ",
+        [data.type],
+        (err,result)=>{
+            if(err){
+                return callBack(err,null);
+            }
+            return callBack(null,result);
+        }
+        )
+    }
 }
 

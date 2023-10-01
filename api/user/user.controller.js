@@ -70,35 +70,39 @@ module.exports ={
     },
     loginUserController:(req,res)=>{
         const data = req.body;
-        console.log(data.email)
+        console.log("Suyog Send")
+        console.log(data);
         loginUserService(data,(err,results)=>{
             const jsontoken = sign({ result: results }, process.env.KEY, {
                 expiresIn: "30d",
               });
-            results = results[0]
+            console.log("This is the results")
+            console.log(results)
             if(err){
                 return res.json({
                     success:0,
                     message:"Server Error"
                 })
             }
-            if(data.email != results.email){
+            if(results[0] === undefined){
                 return res.json({
                     success:0,
                     message:"The email doesn't exist"
                 })
             }
-            if(data.password != results.password){
+            if(results[0].password === data.password){
                 return res.json({
-                    success:0,
-                    message:"The credentials donot match"
+                    success:1,
+                    message:"Successfully Logged In",
+                    token:jsontoken
                 })
             }
-            return res.json({
-                success:1,
-                message:"Successfully logged in",
-                token:jsontoken
-            })
+            if(results[0].password !== data.password){
+                return res.json({
+                    success:0,
+                    message:"Invalid Credentials"
+                })
+            }
         })
     },
     viewItemController: (req, res) => {

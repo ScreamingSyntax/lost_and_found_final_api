@@ -1,4 +1,4 @@
-const { viewProduct: viewProductService, addItem: addItemService, removeItem: removeItemService, updateItemName: updateItemNameService, approveItemsService, sortByStatus, rejectItemsService, searchProductService, searchUnclaimedProductService, getAdminService, getParticularAdminDetails, showReportsService, detailedReportViewService, searchReportViewService, adminLoginService,viewReportCategoriesService,addCategoriesService,viewSpecificCategoriesService } = require("./admin.service");
+const { viewProduct: viewProductService, addItem: addItemService, removeItem: removeItemService, updateItemName: updateItemNameService, approveItemsService, sortByStatus, rejectItemsService, searchProductService, searchUnclaimedProductService, getAdminService, getParticularAdminDetails, showReportsService, detailedReportViewService, searchReportViewService, adminLoginService,viewReportCategoriesService,addCategoriesService,viewSpecificCategoriesService,sendMailToCategory } = require("./admin.service");
 const { json } = require("body-parser");
 const { sign } = require('jsonwebtoken')
 const { fs } = require("node:fs");
@@ -16,8 +16,8 @@ const deleteImage = (filePath, imageName) => {
 module.exports = {
 
     viewProduct: (req, res) => {
-        viewProductService((err, results) => {
 
+        viewProductService((err, results) => {
             if (err) {
                 return res.json({
                     success: 0,
@@ -403,7 +403,7 @@ module.exports = {
             console.log(info)
             return res.json({
                 success: 1,
-                message: "Send Mail"
+                message: "Sent Mail"
             })
         });
     },
@@ -439,6 +439,158 @@ module.exports = {
                 })
             }
         })
+    },
+    categoryEmailController:(req,res)=>{
+        data = req.body;
+        type = data.type
+        sendMailToCategory(data,(err,result)=>{
+            if(err){
+                return res.json({
+                    success:0,
+                    message:"Server Error"
+                })
+            }
+            // console.log(result)
+            if(result[0] === undefined){
+                console.log("Meo")
+                return res.json({
+                    success:0,
+                    message:"No Reports Found of that Category"
+                })
+            }
+            if(result[0] !== undefined){
+                result.forEach(data=>{
+                    email = data.email
+                        var mailOptions = {
+                            to: email,
+                            subject: "Your item might have been found ",
+                            html: `
+                            <!DOCTYPE html>
+                            <html>
+                            <head>
+                               <title>Lost and Found Application - Team Elevate</title>
+                               <style>
+                                  body {
+                                     font-family: 'Poppins', sans-serif;
+                                     background-color: #f5f5f5;
+                                     margin: 0;
+                                     padding: 0;
+                                  }
+                            
+                                  .container {
+                                     max-width: 600px;
+                                     margin: 0 auto;
+                                     background-color: #ffffff;
+                                     border-radius: 10px;
+                                     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+                                     padding: 20px;
+                                  }
+                            
+                                  h1 {
+                                     color: #3498db;
+                                     font-size: 36px;
+                                     margin: 0;
+                                  }
+                            
+                                  h3 {
+                                     color: #3498db;
+                                     font-size: 18px;
+                                     margin: 20px 0;
+                                  }
+                            
+                                  p {
+                                     color: #777777;
+                                     font-size: 16px;
+                                     line-height: 1.5;
+                                     margin-bottom: 20px;
+                                  }
+                            
+                                  .otp-container {
+                                     background-color: #f5f5f5;
+                                     border: 2px solid #3498db;
+                                     border-radius: 5px;
+                                     padding: 10px;
+                                     display: inline-block;
+                                  }
+                            
+                                  .otp {
+                                     font-weight: bold;
+                                     color: #3498db;
+                                     font-size: 24px;
+                                  }
+                            
+                                  .link {
+                                     color: #3498db;
+                                     text-decoration: none;
+                                     transition: color 0.3s ease;
+                                  }
+                            
+                                  .link:hover {
+                                     color: #ff7f50;
+                                  }
+                            
+                                  .social-icons {
+                                     margin-top: 20px;
+                                     text-align: center;
+                                  }
+                            
+                                  .social-icons a {
+                                     display: inline-block;
+                                     margin: 0 10px;
+                                     width: 40px;
+                                     height: 40px;
+                                     line-height: 40px;
+                                     text-align: center;
+                                     border-radius: 50%;
+                                     background-color: #3498db;
+                                     color: #ffffff;
+                                     text-decoration: none;
+                                     font-size: 18px;
+                                  }
+                            
+                                  .footer {
+                                     margin-top: 30px;
+                                     text-align: center;
+                                  }
+                            
+                                  .footer p {
+                                     color: #777777;
+                                     font-size: 14px;
+                                  }
+                               </style>
+                            </head>
+                            <body>
+                               <div class="container fade-in scale-in">
+                                  <h1>Lost and Found</h1>
+                                  <p>
+                                    We've just updated our website, and it seems like we've come across an item that could potentially be a match for the one you've lost. We're excited to share that we've found a ${type} that might be yours! 
+                                  </p>
+            
+                               </div>
+                               <div class="footer">
+                                  <p>© 2023 Lost and Found Application - Team Elevate</p>
+                               </div>
+                            </body>
+                            </html>            
+                            `
+                        };
+                        transporter.sendMail(mailOptions, (error, info) => {
+                            if (error) {
+                                return res.json({
+                                    success: 0,
+                                    message: "Error Sending Mail"
+                                })
+                            }
+                            console.log(info)
+                            return res.json({
+                                success: 1,
+                                message: "Sent Mail"
+                            })
+                        });
+                })
+            }
 
+        })
+        // email = ["whcloud91@gmail.com","np05cp4s220001@iic.edu.np"]
     }
 };

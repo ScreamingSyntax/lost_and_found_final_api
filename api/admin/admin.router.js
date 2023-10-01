@@ -1,4 +1,4 @@
-const {viewProduct,addItems,removeItem,updateItemName,searchReportViewController,approveItemController,sortProduct,rejectItemController,searchProductController,searchProductControllerUnclaimed,showReportController,detailedReportController,adminLoginController, viewProductByOrderDate,sendFoundNotification,viewReportCategoriesController,addCategoryController} = require("./admin.controller");
+const {viewProduct,addItems,removeItem,updateItemName,searchReportViewController,approveItemController,sortProduct,rejectItemController,searchProductController,searchProductControllerUnclaimed,showReportController,detailedReportController,adminLoginController, viewProductByOrderDate,sendFoundNotification,viewReportCategoriesController,addCategoryController,categoryEmailController} = require("./admin.controller");
 const router = require('express').Router();
 const multer = require("multer");
 const path = require("path");
@@ -33,4 +33,5 @@ router.post("/report",checkToken,detailedReportController);
 router.post("/searchR",checkToken,searchReportViewController)
 router.post("/login",adminLoginController);
 router.post("/mail",sendFoundNotification);
+router.post("/emailLostReport",categoryEmailController);
 module.exports = router;
