@@ -36,7 +36,7 @@ module.exports={
         })
     },
     getUserByEmailService:(email,callBack)=>{
-        pool.query("SELECT * FROM USERS where email = ?",
+        pool.query("SELECT * FROM users where email = ?",
         [email],
         (err,result)=>{
             if(err){
@@ -150,7 +150,7 @@ module.exports={
         });
     },
     viewReportService:(data,callBack)=>{
-        pool.query("select report.report_id, report.lost_location,report.report_title,report.report_description,report.report_date,report.is_found from users right join report on users.userID = report.userID where users.email = ? ",
+        pool.query("select report.report_id, report.lost_location,report.report_title,report.report_description,report.report_date,report.is_found from users right join report on users.userID = report.userID where users.email = ? order by report.is_found",
         [data.email],
         (err,result,field)=>{
             if (err){
@@ -160,7 +160,7 @@ module.exports={
         })
     },
     lostItemFoundService:(data,callBack)=>{
-        pool.query(" update report set is_found=1 where report_id = ?",
+        pool.query("update report set is_found=1 where report_id = ?",
         [data.report_id],
         (err,result,field)=>{
             if(err){

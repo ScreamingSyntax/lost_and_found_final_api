@@ -17,10 +17,11 @@ module.exports ={
             })
         }
         getUserByEmailService(data.email,(err,results)=>{
+            console.log(err)
             if(err){
                 return res.json({
                     success:0,
-                    message:"Server Error"
+                    message:"Server Error dd"
                 })
             }
 
@@ -29,7 +30,7 @@ module.exports ={
                     if(err){
                         return res.json({
                             success:0,
-                            message:"Server Error"
+                            message:"Server Error da"
                         })
                     }
                     console.log(results)
@@ -43,7 +44,7 @@ module.exports ={
                         if(err){
                             return res.json({
                                 success:0,
-                                message:"Server Error"
+                                message:"Server Error db"
                             })
                         }
                         return res.json({
