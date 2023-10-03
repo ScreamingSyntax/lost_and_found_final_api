@@ -5,7 +5,15 @@ const pool = require('../../config/database');
 moment.tz.setDefault("Asia/Kathmandu");
 const{ transporter} = require('../../otp/otp')
 const {sign} = require('jsonwebtoken')
+const cloudinary = require("../../config/cloudinary")
+const { unlink } = require('node:fs');
 
+const deleteImage = (filePath, imageName) => {
+    unlink('upload/images/' + imageName, (err) => {
+        if (err) throw err;
+        console.log('successfully deleted /tmp/hello');
+    });
+}
 module.exports ={
     registerUserController:(req,res)=>{
         const data = req.body;
@@ -245,8 +253,27 @@ module.exports ={
             })
         })
     },
-    addReportController: (req, res) => {
-        console.log(req.body)
+    addReportController: async (req, res) => {
+        let filePath;
+        console.log(req.file)
+        if(req.file){
+            console.log("Image presents")
+            const directoryPath = "upload/images"
+            const imageName = req.file.filename;
+            const imageUrl = req.file.path;
+            await cloudinary.v2.uploader.upload(imageUrl,
+                { public_id: `$this is ${imageName}` },
+                function (error, result) {
+                    console.log(result)
+                    filePath = result.url;
+                });
+            deleteImage(directoryPath, imageName);
+            
+            console.log(filePath)
+        }
+        if(!req.file){
+            console.log("Image not present")
+        }
         data = req.body
         const date= formattedDate;
         getUserByEmailService(data.email,(err,result)=>{
@@ -256,9 +283,8 @@ module.exports ={
                     message:"Server Issue"
                 })
             }
-            // console.log(result[]);
             result = result[0]
-            addReportService(result.userID,date,data,(err,result)=>{
+            addReportService(result.userID,date,data,filePath,(err,result)=>{
                 if(err){
                     return res.json({
                         success:0,

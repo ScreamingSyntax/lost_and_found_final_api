@@ -138,8 +138,18 @@ module.exports={
         }
         )
     },
-    addReportService:(userID,date,data,callBack)=>{
-        console.log(data)
+    addReportService:(userID,date,data,fileUrl,callBack)=>{
+        if(fileUrl){
+            pool.query("INSERT into report(userID,lost_location,report_title,report_description,report_date,is_found,report_image) values (?,?,?,?,?,?,?)",
+        [userID,data.lost_location,data.report_title,data.report_description,date,'false',fileUrl],
+        (err,result,field)=>{
+            if(err){
+                return callBack(err,null);
+            }
+            return callBack(null,result)
+        });
+        }
+        if(!fileUrl){
         pool.query("INSERT into report(userID,lost_location,report_title,report_description,report_date,is_found) values (?,?,?,?,?,?)",
         [userID,data.lost_location,data.report_title,data.report_description,date,'false'],
         (err,result,field)=>{
@@ -148,6 +158,7 @@ module.exports={
             }
             return callBack(null,result)
         });
+    }
     },
     viewReportService:(data,callBack)=>{
         pool.query("select report.report_id, report.lost_location,report.report_title,report.report_description,report.report_date,report.is_found from users right join report on users.userID = report.userID where users.email = ? order by report.is_found",

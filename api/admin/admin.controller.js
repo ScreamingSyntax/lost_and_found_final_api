@@ -93,7 +93,7 @@ module.exports = {
         })
     },
     addItems: async (req, res) => {
-
+        console.log(req.file)
         if (!req.file) {
             return res.json({
                 success: 0,
@@ -145,6 +145,7 @@ module.exports = {
     },
     updateItemName: (req, res) => {
         const filePath = req.file.filename;
+
         const data = req.body;
 
         updateItemNameService(data, filePath, (err, results) => {
@@ -193,8 +194,8 @@ module.exports = {
     adminLoginController: (req, res) => {
         const data = req.body;
         adminLoginService(data, (err, results) => {
+            console.log(results)
             if (err) {
-                f
                 return res.json({
                     success: 0,
                     message: "Server Error"
@@ -450,7 +451,6 @@ module.exports = {
                     message:"Server Error"
                 })
             }
-            // console.log(result)
             if(result[0] === undefined){
                 console.log("Meo")
                 return res.json({
@@ -458,11 +458,12 @@ module.exports = {
                     message:"No Reports Found of that Category"
                 })
             }
+            email_list = []
+            result.forEach(element=> email_list.push(element.email))
             if(result[0] !== undefined){
-                result.forEach(data=>{
                     email = data.email
                         var mailOptions = {
-                            to: email,
+                            to: email_list,
                             subject: "Your item might have been found ",
                             html: `
                             <!DOCTYPE html>
@@ -512,28 +513,23 @@ module.exports = {
                                      padding: 10px;
                                      display: inline-block;
                                   }
-                            
                                   .otp {
                                      font-weight: bold;
                                      color: #3498db;
                                      font-size: 24px;
                                   }
-                            
                                   .link {
                                      color: #3498db;
                                      text-decoration: none;
                                      transition: color 0.3s ease;
                                   }
-                            
                                   .link:hover {
                                      color: #ff7f50;
                                   }
-                            
                                   .social-icons {
                                      margin-top: 20px;
                                      text-align: center;
                                   }
-                            
                                   .social-icons a {
                                      display: inline-block;
                                      margin: 0 10px;
@@ -547,12 +543,10 @@ module.exports = {
                                      text-decoration: none;
                                      font-size: 18px;
                                   }
-                            
                                   .footer {
                                      margin-top: 30px;
                                      text-align: center;
                                   }
-                            
                                   .footer p {
                                      color: #777777;
                                      font-size: 14px;
@@ -565,7 +559,7 @@ module.exports = {
                                   <p>
                                     We've just updated our website, and it seems like we've come across an item that could potentially be a match for the one you've lost. We're excited to share that we've found a ${type} that might be yours! 
                                   </p>
-            
+
                                </div>
                                <div class="footer">
                                   <p>© 2023 Lost and Found Application - Team Elevate</p>
@@ -587,7 +581,7 @@ module.exports = {
                                 message: "Sent Mail"
                             })
                         });
-                })
+    
             }
 
         })

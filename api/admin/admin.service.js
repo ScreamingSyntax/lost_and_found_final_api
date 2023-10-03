@@ -164,11 +164,9 @@ module.exports = {
         );
     },
     adminLoginService:(data,callBack)=>{
-        // console.log(data)
         pool.query("SELECT * FROM admin_lost where user_name=?",
         [data.user_name],
         (err,result)=>{
-            // console.log(`Asli data ${result}`)
             if(err){
                 return callBack(err,null)
             }
