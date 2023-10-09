@@ -1,10 +1,11 @@
-const { viewProduct: viewProductService, addItem: addItemService, removeItem: removeItemService, updateItemName: updateItemNameService, approveItemsService, sortByStatus, rejectItemsService, searchProductService, searchUnclaimedProductService, getAdminService, getParticularAdminDetails, showReportsService, detailedReportViewService, searchReportViewService, adminLoginService,viewReportCategoriesService,addCategoriesService,viewSpecificCategoriesService,sendMailToCategory } = require("./admin.service");
+const { viewProduct: viewProductService, addItem: addItemService, removeItem: removeItemService, updateItemName: updateItemNameService, approveItemsService, sortByStatus, rejectItemsService, searchProductService, searchUnclaimedProductService, getAdminService, getParticularAdminDetails, showReportsService, detailedReportViewService, searchReportViewService, adminLoginService,viewReportCategoriesService,addCategoriesService,viewSpecificCategoriesService,sendMailToCategory,getRulesService,updateRuleService } = require("./admin.service");
 const { json } = require("body-parser");
 const { sign } = require('jsonwebtoken')
 const { fs } = require("node:fs");
 const { unlink } = require('node:fs');
 const cloudinary = require("../../config/cloudinary")
-const { router, transporter } = require('../../otp/otp')
+const { router, transporter } = require('../../otp/otp');
+const internal = require("node:stream");
 
 const deleteImage = (filePath, imageName) => {
     unlink('upload/images/' + imageName, (err) => {
@@ -254,6 +255,38 @@ module.exports = {
             })
         })
     },
+    getRulesController:(req,res)=>{
+        getRulesService((err,results)=>
+        {
+            if(err){
+                return res.json({
+                    success:0,
+                    message:"Error Fetching Rules"
+                })
+            }
+            return res.json({
+                success:1,
+                data:results[0]
+            })
+        });
+    },
+    updateRulesController:(req,res)=>{
+        const data = req.body;
+        console.log(data)
+        updateRuleService(data,(err,results)=>{
+            if(err){
+                return res.json({
+                    success:0,
+                    message:"Error Updating Rules"
+                })
+            }
+            return res.json({
+                success:1,
+                message:"Successfully Updated Rules"
+            })
+        })
+        
+    },
     searchReportViewController: (req, res) => {
         const data = req.body;
         console.log(data)
@@ -441,10 +474,21 @@ module.exports = {
             }
         })
     },
-    categoryEmailController:(req,res)=>{
+    categoryEmailController: async (req,res)=>{
         data = req.body;
         type = data.type
-        sendMailToCategory(data,(err,result)=>{
+        interval = 0;
+        await getRulesService((err,result)=>{
+            if(err){
+                return res.json({
+                    success:0,
+                    message:"Server Error"
+                })
+            }
+            interval = result.report_range_days;
+            
+        })
+        sendMailToCategory(data,interval,(err,result)=>{
             if(err){
                 return res.json({
                     success:0,
@@ -452,7 +496,6 @@ module.exports = {
                 })
             }
             if(result[0] === undefined){
-                console.log("Meo")
                 return res.json({
                     success:0,
                     message:"No Reports Found of that Category"
@@ -461,6 +504,7 @@ module.exports = {
             email_list = []
             result.forEach(element=> email_list.push(element.email))
             if(result[0] !== undefined){
+                    // console.log()
                     email = data.email
                         var mailOptions = {
                             to: email_list,

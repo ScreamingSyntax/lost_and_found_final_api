@@ -161,7 +161,7 @@ module.exports={
     }
     },
     viewReportService:(data,callBack)=>{
-        pool.query("select report.report_id, report.lost_location,report.report_title,report.report_description,report.report_date,report.is_found from users right join report on users.userID = report.userID where users.email = ? order by report.is_found",
+        pool.query("select report.report_id,report.report_image, report.lost_location,report.report_title,report.report_description,report.report_date,report.is_found from users right join report on users.userID = report.userID where users.email = ? order by report.is_found",
         [data.email],
         (err,result,field)=>{
             if (err){

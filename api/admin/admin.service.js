@@ -1,3 +1,4 @@
+const removeUploadedFiles = require("multer/lib/remove-uploaded-files");
 const pool = require("../../config/database")
 
 
@@ -141,7 +142,7 @@ module.exports = {
         );
     },
     showReportsService:(callBack)=>{
-        pool.query("select users.userName, users.email, report.lost_location, report.report_title, report_description, report.report_date, report.is_found from users right join report on users.userID = report.userID order by is_found",
+        pool.query("select users.userName, users.email, report.lost_location, report.report_title, report_description, report.report_date, report.is_found,report.report_image from users right join report on users.userID = report.userID order by is_found",
         [],
         (err,result)=>{
             console.log(err)
@@ -218,9 +219,31 @@ module.exports = {
             return callBack(null,result);
         });
     },
-    sendMailToCategory:(data,callBack)=>{
-        pool.query("select distinct users.email from users join report on users.userID=report.userID where report.report_title= ? and report.is_found=0 ",
-        [data.type],
+    sendMailToCategory:(data,interval,callBack)=>{
+        pool.query("select distinct users.email,report.report_date  from users join report on users.userID=report.userID where report.report_title= ? and report.is_found=0 and report.report_date  >= DATE_SUB(CURDATE(), INTERVAL ? DAY)",
+        [data.type,data.interval],
+        (err,result)=>{
+            if(err){
+                return callBack(err,null);
+            }
+            return callBack(null,result);
+        }
+        )
+    },
+    getRulesService: callBack =>{
+        pool.query("Select * from rules ",
+        [],
+        (err,result)=>{
+            if(err) {
+                return callBack(err,null);
+            }
+            return callBack(null,result);
+        }
+        )
+    },
+    updateRuleService:(data,callBack)=>{
+        pool.query("Update rules set otp_timeout_minutes = ?, report_range_days = ?",
+        [data.minutes,data.days],
         (err,result)=>{
             if(err){
                 return callBack(err,null);
@@ -229,5 +252,6 @@ module.exports = {
         }
         )
     }
+    
 }
 

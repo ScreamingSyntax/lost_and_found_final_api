@@ -1,4 +1,4 @@
-const {viewProduct,addItems,removeItem,updateItemName,searchReportViewController,approveItemController,sortProduct,rejectItemController,searchProductController,searchProductControllerUnclaimed,showReportController,detailedReportController,adminLoginController, viewProductByOrderDate,sendFoundNotification,viewReportCategoriesController,addCategoryController,categoryEmailController} = require("./admin.controller");
+const {viewProduct,addItems,removeItem,updateItemName,searchReportViewController,approveItemController,sortProduct,rejectItemController,searchProductController,searchProductControllerUnclaimed,showReportController,detailedReportController,adminLoginController, viewProductByOrderDate,sendFoundNotification,viewReportCategoriesController,addCategoryController,categoryEmailController,getRulesController,updateRulesController} = require("./admin.controller");
 const router = require('express').Router();
 const multer = require("multer");
 const path = require("path");
@@ -24,6 +24,7 @@ router.get("/",checkToken,viewProduct);
 router.post("/",checkToken,upload.single('item_image'), addItems);
 router.delete("/",checkToken,removeItem);
 router.patch("/",checkToken,upload.single('item_image'),updateItemName);
+router.patch("/rules",checkToken,updateRulesController);
 router.post("/approve",checkToken,approveItemController);
 router.post("/reject",checkToken,rejectItemController);
 router.post("/search",checkToken,searchProductController);
@@ -32,6 +33,7 @@ router.get("/report",showReportController);
 router.post("/report",checkToken,detailedReportController);
 router.post("/searchR",checkToken,searchReportViewController)
 router.post("/login",adminLoginController);
-router.post("/mail",sendFoundNotification);
-router.post("/emailLostReport",categoryEmailController);
+router.post("/mail",checkToken,sendFoundNotification);
+router.post("/emailLostReport",checkToken,categoryEmailController);
+router.get("/rules",checkToken,getRulesController);
 module.exports = router;
